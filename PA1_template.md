@@ -1,13 +1,4 @@
----
-output: 
-  html_document: 
-    fig_height: 3
-    fig_width: 5
-    keep_md: yes
----
-```{r setup, include=FALSE}
-      knitr::opts_chunk$set(cache=TRUE)
-```
+
 
 Peer Assessment 1
 =======================================
@@ -17,7 +8,8 @@ Peer Assessment 1
 
 This code will load the necessary packages and read-in the Activity Monitoring dataset associated with this assignment.
 
-```{r, echo = TRUE}
+
+```r
 # Load the required packages
 require(dplyr)
 require(ggplot2)
@@ -36,19 +28,62 @@ activity_data <- tbl_df(activity_data) %>% # Chain to mutate function
 
 Next, we will compute the average (i.e., mean) number of steps for each day of the week in the next chunk of code.
 
-```{r, echo = TRUE}
+
+```r
 # Group data by weekday variable
 weekday_data <- group_by(activity_data, weekday)
 
 # Calculate the total number of steps taken each day
 summarize(weekday_data, sum(steps, na.rm = TRUE))
+```
 
+```
+## Source: local data frame [7 x 2]
+## 
+##     weekday sum(steps, na.rm = TRUE)
+## 1    Friday                    86518
+## 2    Monday                    69824
+## 3  Saturday                    87748
+## 4    Sunday                    85944
+## 5  Thursday                    65702
+## 6   Tuesday                    80546
+## 7 Wednesday                    94326
+```
+
+```r
 # Plot histogram of steps taken per day
 # Use log scale because of skew in the data
 qplot(steps, data = weekday_data, facets = . ~ weekday, log = "x", color = weekday)
+```
 
+```
+## stat_bin: binwidth defaulted to range/30. Use 'binwidth = x' to adjust this.
+## stat_bin: binwidth defaulted to range/30. Use 'binwidth = x' to adjust this.
+## stat_bin: binwidth defaulted to range/30. Use 'binwidth = x' to adjust this.
+## stat_bin: binwidth defaulted to range/30. Use 'binwidth = x' to adjust this.
+## stat_bin: binwidth defaulted to range/30. Use 'binwidth = x' to adjust this.
+## stat_bin: binwidth defaulted to range/30. Use 'binwidth = x' to adjust this.
+## stat_bin: binwidth defaulted to range/30. Use 'binwidth = x' to adjust this.
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-2-1.png) 
+
+```r
 # Calculate the mean and median number of steps for each weekday
 summarize(weekday_data, mean(steps, na.rm = TRUE), median(steps, na.rm = TRUE))
+```
+
+```
+## Source: local data frame [7 x 3]
+## 
+##     weekday mean(steps, na.rm = TRUE) median(steps, na.rm = TRUE)
+## 1    Friday                  42.91567                           0
+## 2    Monday                  34.63492                           0
+## 3  Saturday                  43.52579                           0
+## 4    Sunday                  42.63095                           0
+## 5  Thursday                  28.51649                           0
+## 6   Tuesday                  31.07485                           0
+## 7 Wednesday                  40.94010                           0
 ```
 
 
@@ -56,7 +91,8 @@ summarize(weekday_data, mean(steps, na.rm = TRUE), median(steps, na.rm = TRUE))
 
 Next, we will analyze the data for daily activity patterns. We identify the 5-minute interval with the maximum number of steps (based on the average across all days).
 
-```{r, echo = TRUE}
+
+```r
 # Group the activity data by time intervals
 interval_data <- group_by(activity_data, interval)
 
@@ -68,25 +104,36 @@ int_steps_data <- summarize(interval_data,
 names(int_steps_data)[2] <- "average_steps"
 
 qplot(interval, average_steps,  data = int_steps_data, geom = "path")
+```
 
+![](PA1_template_files/figure-html/unnamed-chunk-3-1.png) 
+
+```r
 # Identify index of time interval with maximum average-steps
 max_steps <- max(int_steps_data$average_steps)
 max_index <- which(int_steps_data$average_steps == max_steps)
 max_interval <- int_steps_data$interval[max_index]
 ```
 
-The interval with the maximum number of steps (`r max_steps` steps) begins at `r max_interval` and ends at `r int_steps_data$interval[max_index + 1]`.
+The interval with the maximum number of steps (206.1698113 steps) begins at 835 and ends at 840.
 
 
 ### Imputing missing values
 
 The below code calculates and reports the total number of missing value and then imputes 
 
-```{r, echo = TRUE}
+
+```r
 # Count and print the total number of NAs in the data frame
 total_NA <- sum(is.na(activity_data))
 print(total_NA)
+```
 
+```
+## [1] 2304
+```
+
+```r
 # Impute missing value
 imputed_data <- activity_data
       
@@ -106,20 +153,63 @@ weekday_imp_data <- group_by(imputed_data, weekday)
 
 # Calculate the total number of steps taken each day
 summarize(weekday_imp_data, sum(steps, na.rm = FALSE))
+```
 
+```
+## Source: local data frame [7 x 2]
+## 
+##     weekday sum(steps, na.rm = FALSE)
+## 1    Friday                 108050.38
+## 2    Monday                  91356.38
+## 3  Saturday                  98514.19
+## 4    Sunday                  96710.19
+## 5  Thursday                  76468.19
+## 6   Tuesday                  80546.00
+## 7 Wednesday                 105092.19
+```
+
+```r
 # Plot histogram of steps taken per day
 # Use log scale because of skew in the data
 qplot(steps, data = weekday_imp_data, 
       facets = . ~ weekday, log = "x", color = weekday)
+```
 
+```
+## stat_bin: binwidth defaulted to range/30. Use 'binwidth = x' to adjust this.
+## stat_bin: binwidth defaulted to range/30. Use 'binwidth = x' to adjust this.
+## stat_bin: binwidth defaulted to range/30. Use 'binwidth = x' to adjust this.
+## stat_bin: binwidth defaulted to range/30. Use 'binwidth = x' to adjust this.
+## stat_bin: binwidth defaulted to range/30. Use 'binwidth = x' to adjust this.
+## stat_bin: binwidth defaulted to range/30. Use 'binwidth = x' to adjust this.
+## stat_bin: binwidth defaulted to range/30. Use 'binwidth = x' to adjust this.
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-4-1.png) 
+
+```r
 # Calculate the mean and median number of steps for each weekday
 summarize(weekday_imp_data, mean(steps, na.rm = FALSE),
           median(steps, na.rm = FALSE))
 ```
 
+```
+## Source: local data frame [7 x 3]
+## 
+##     weekday mean(steps, na.rm = FALSE) median(steps, na.rm = FALSE)
+## 1    Friday                   41.68610                            0
+## 2    Monday                   35.24552                            0
+## 3  Saturday                   42.75789                            0
+## 4    Sunday                   41.97491                            0
+## 5  Thursday                   29.50162                            0
+## 6   Tuesday                   31.07485                            0
+## 7 Wednesday                   40.54483                            0
+```
+
 If we compare the summaries with and without the missing data we observe small differences between the average number of steps taken per day.  See the `differences` column in the below output; in some cases, averages went up and in others, averages went down.
 
-```{r, echo = TRUE}
+
+```r
 # Store the summary data when NAs are removed
 with_NAs <- summarize(weekday_data, mean(steps, na.rm = TRUE))
 # Rename summary column
@@ -143,12 +233,24 @@ comparison$weekday <-
 comparison[order(comparison$weekday),]
 ```
 
+```
+##     weekday with_NAs without_NAs difference
+## 4    Sunday 42.63095    41.97491  0.6560441
+## 2    Monday 34.63492    35.24552 -0.6105953
+## 6   Tuesday 31.07485    31.07485  0.0000000
+## 7 Wednesday 40.94010    40.54483  0.3952783
+## 5  Thursday 28.51649    29.50162 -0.9851229
+## 1    Friday 42.91567    41.68610  1.2295722
+## 3  Saturday 43.52579    42.75789  0.7678993
+```
+
 
 ### Differences in activity patterns
 
 An individual's activity patterns vary depending on the day. The chunk below labels the data into "weekend" and "weekday" factors and produces a plot that shows the average number of steps for each time interval.
 
-```{r, echo = TRUE}
+
+```r
 # Create weekend character vector
 weekend <- c("Sunday", "Saturday")
 
@@ -169,5 +271,7 @@ names(act_week_sum)[3] <- "average_steps"
 qplot(interval, average_steps, data = act_week_sum, 
       facets = week_ind ~., geom = "path", color = week_ind)
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-6-1.png) 
 
 On weekdays, people tend to accumulate steps earlier in the day.  Activity during the middle of the day is relatively low compared to the high step counts seen in the morning.  On the weekend, individuals begin to accumulate steps later in the morning (perhaps after sleeping in).
