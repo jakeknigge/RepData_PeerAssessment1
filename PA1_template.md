@@ -1,8 +1,8 @@
 ---
 output: 
   html_document: 
-    fig_height: 6
-    fig_width: 10
+    fig_height: 4
+    fig_width: 6
     keep_md: yes
 ---
 
